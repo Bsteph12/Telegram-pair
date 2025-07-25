@@ -81,7 +81,7 @@ repo
 `;
 
 // Configuration de l'image de démarrage
-const START_IMAGE_URL = process.env.START_IMAGE_URL || 'https://i.imgur.com/your-image.jpg'; // Remplacez par votre URL d'image
+const START_IMAGE_URL = process.env.START_IMAGE_URL || 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg'; // Remplacez par votre URL d'image
 
 // Base de données en mémoire
 const sessions = new Map();
@@ -212,9 +212,9 @@ Numéro: +${phoneNumber}
 Créé le: ${sessionData.createdAt.toLocaleString()}
 Status: ${sessionData.status}
 
-┌──────────────────────────────────┐
-│         📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒         │
-└──────────────────────────────────┘
+┌───────────────┐
+│𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒     
+└─────────────────┘
 1. Copiez le Session ID ci-dessus
 2. Ouvrez votre fichier config.js
 3. Collez le Session ID dans la configuration
