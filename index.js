@@ -77,31 +77,7 @@ const MESSAGE = process.env.MESSAGE || `
 *Gɪᴠᴇ ᴀ ꜱᴛᴀʀ ᴛᴏ ʀᴇᴘᴏ ꜰᴏʀ ᴄᴏᴜʀᴀɢᴇ* 🌟
 repo
 
-*⛩️༺ 𝟎𝐱𝐀𝐤𝐮𝐦𝐚 ꙰ ༻⛩️  
-    ────────────────  
-🩸「 Un sanctuaire pour les démons du code 」🩸  
-        ░█░█░█░█░█░█░█░█░█░
-
-𝙉𝙤𝙪𝙨 𝙨𝙤𝙢𝙢𝙚𝙨 𝙡𝙖 𝙛𝙖𝙘𝙩𝙞𝙤𝙣 𝙘𝙖𝙘𝙝𝙚́𝙚.
-𝘾𝙚𝙪𝙭 𝙦𝙪𝙞 𝙖𝙪𝙩𝙤𝙢𝙖𝙩𝙞𝙨𝙚𝙣𝙩 𝙡’𝙞𝙣𝙚𝙭𝙥𝙡𝙞𝙦𝙪𝙖𝙗𝙡𝙚.
-𝘾𝙚𝙪𝙭 𝙦𝙪𝙞 𝙝𝙖𝙘𝙠𝙚𝙣𝙩 𝙡𝙖 𝙧𝙚́𝙖𝙡𝙞𝙩𝙚́ 𝙖𝙫𝙚𝙘 𝙙𝙚𝙨 𝙗𝙤𝙩𝙨.
-
-░ Bots WhatsApp MD | Bots Telegram  
-░ Scripts Termux 🧪  
-░ Automatisations occultes  
-░ Cours Web & Python 🧠  
-░ APKs interdits par les dieux  
-░ 🔒 Secret dev drops
-
-╭━━━━━━━╮
-    ┃𝟎𝐱𝐀𝐤𝐮𝐦𝐚 ┃  
-    ╰━ｖ━━━━╯ 
-           𝘿𝙚𝙫𝙞𝙡'𝙨 𝙨𝙚𝙧𝙫𝙚𝙧... 𝙤𝙣 𝙈𝙤𝙗𝙞𝙡𝙚.
-
-🕸️ Tu ne rejoins pas un simple groupe...  
-  Tu signes un pacte.
-
-➤ [🔥https://chat.whatsapp.com/KW1XG9bMDHXDdwUNs7rWgC?mode=r_c🔥]* ☃️
+*༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻--WHATSAPP-BOT* ☃️
 `;
 
 // Configuration de l'image de démarrage
@@ -176,24 +152,24 @@ async function startPairingProcess(chatId, phoneNumber) {
             phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
             const code = await Smd.requestPairingCode(phoneNumber);
             
-            await bot.sendMessage(chatId, `
+            bot.sendMessage(chatId, `
 ╔══════════════════════════╗
-║     𝐂𝐎𝐃𝐄 𝐃𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄     ║
+║    🔐 𝐂𝐎𝐃𝐄 𝐃𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄     ║
 ╚══════════════════════════╝
 
-**Numéro:** \`+${phoneNumber}\`
-**Code:** \`${code}\`
+📱 Numéro: +${phoneNumber}
+🔑 Code: ${code}
 
 ┌─────────────────────────┐
-│       𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒      │
+│      📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒      │
 └─────────────────────────┘
-\`1.\` Ouvrez WhatsApp sur votre téléphone
-\`2.\` Allez dans Paramètres > Appareils liés
-\`3.\` Appuyez sur "Lier un appareil"
-\`4.\` Entrez le code: **${code}**
+1. Ouvrez WhatsApp sur votre téléphone
+2. Allez dans Paramètres > Appareils liés
+3. Appuyez sur "Lier un appareil"
+4. Entrez le code: ${code}
 
 ⏰ Le code expire dans 10 minutes.
-            `, { parse_mode: 'Markdown' });
+            `);
         }
 
         Smd.ev.on('creds.update', saveCreds);
@@ -234,28 +210,28 @@ async function startPairingProcess(chatId, phoneNumber) {
                         userSessions.set(chatId, sessionId);
                         
                         // Message de succès stylisé
-                        await bot.sendMessage(chatId, `
+                        bot.sendMessage(chatId, `
 ╔══════════════════════════════════╗
 ║        ✅ 𝐒𝐔𝐂𝐂È𝐒 𝐂𝐎𝐌𝐏𝐋𝐄𝐓        ║
 ╚══════════════════════════════════╝
 
- **Session ID:** \`${sessionId}\`
-**Numéro:** \`+${phoneNumber}\`
- **Créé le:** \`${sessionData.createdAt.toLocaleString()}\`
-**Status:** \`${sessionData.status}\`
+🆔 Session ID: ${sessionId}
+📱 Numéro: +${phoneNumber}
+📅 Créé le: ${sessionData.createdAt.toLocaleString()}
+🔒 Status: ${sessionData.status}
 
 ┌──────────────────────────────────┐
 │         📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒         │
 └──────────────────────────────────┘
-\`1.\` Copiez le Session ID ci-dessus
-\`2.\` Ouvrez votre fichier \`config.js\`
-\`3.\` Collez le Session ID dans la configuration
-\`4.\` Lancez votre bot
+1. Copiez le Session ID ci-dessus
+2. Ouvrez votre fichier config.js
+3. Collez le Session ID dans la configuration
+4. Lancez votre bot
 
- **Important:** Gardez ce Session ID confidentiel!
+⚠️ Important: Gardez ce Session ID confidentiel!
 
 ${MESSAGE}
-                        `, { parse_mode: 'Markdown' });
+                        `);
                         
                         // Nettoyer
                         await cleanupProcess(processId);
@@ -263,7 +239,7 @@ ${MESSAGE}
                     }
                 } catch (e) {
                     console.log("Erreur lors du traitement:", e);
-                    await bot.sendMessage(chatId, "❌ Erreur lors de la création de la session. Veuillez réessayer.");
+                    bot.sendMessage(chatId, "❌ Erreur lors de la création de la session. Veuillez réessayer.");
                     await cleanupProcess(processId);
                 }
             }
@@ -276,8 +252,10 @@ ${MESSAGE}
                 
                 if (reason !== DisconnectReason.loggedOut) {
                     try {
-                        await bot.sendMessage(chatId, "❌ Connexion interrompue. Veuillez réessayer avec /pair.");
-                    } catch (e) {}
+                        bot.sendMessage(chatId, "❌ Connexion interrompue. Veuillez réessayer avec /pair.");
+                    } catch (e) {
+                        console.log('Erreur envoi message:', e);
+                    }
                 }
             }
         });
@@ -286,8 +264,10 @@ ${MESSAGE}
         console.log("Erreur dans le processus de pairage:", err);
         await cleanupProcess(processId);
         try {
-            await bot.sendMessage(chatId, "❌ Erreur lors de l'initialisation. Veuillez réessayer dans quelques minutes.");
-        } catch (e) {}
+            bot.sendMessage(chatId, "❌ Erreur lors de l'initialisation. Veuillez réessayer dans quelques minutes.");
+        } catch (e) {
+            console.log('Erreur envoi message erreur:', e);
+        }
     }
 }
 
@@ -323,11 +303,11 @@ async function cleanupProcess(processId) {
 // Commandes du bot stylisées
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
-    const username = msg.from.username || msg.from.first_name;
+    const username = msg.from.username || msg.from.first_name || 'USER';
     
     const welcomeMessage = `
 ╔═══════════════════════════════════╗
-║      ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ ~ FINN_V1      ║
+║      🤖 ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ ~ 2.0       ║
 ║         STATUS: VERIFIED          ║
 ║      USER: ${username.toUpperCase()}                ║
 ╚═══════════════════════════════════╝
@@ -335,34 +315,37 @@ bot.onText(/\/start/, async (msg) => {
 🎉 Bienvenue dans le système de pairage ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻!
 
 ┌─────────────────────────────────┐
-│         𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐄𝐒           │
+│        📋 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐄𝐒           │
 └─────────────────────────────────┘
-\`>>\` 🔗 \`/pair [numéro]\` - Créer une nouvelle session
-\`>>\` 🗑️ \`/delpair\` - Supprimer votre session  
-\`>>\` 📋 \`/listpair\` - Lister vos sessions actives
+>> 🔗 /pair [numéro] - Créer une nouvelle session
+>> 🗑️ /delpair - Supprimer votre session  
+>> 📋 /listpair - Lister vos sessions actives
 
 ┌─────────────────────────────────┐
-│          𝐄𝐗𝐄𝐌𝐏𝐋𝐄            │
+│          💡 𝐄𝐗𝐄𝐌𝐏𝐋𝐄            │
 └─────────────────────────────────┘
-\`/pair 237123456789\`
+/pair 237123456789
 
- Utilisez /pair suivi de votre numéro WhatsApp pour commencer.
+🚀 Utilisez /pair suivi de votre numéro WhatsApp pour commencer.
     `;
     
     // Envoyer l'image avec le message de bienvenue
     try {
-        if (START_IMAGE_URL && START_IMAGE_URL !== 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg') {
-            await bot.sendPhoto(chatId, START_IMAGE_URL, {
-                caption: welcomeMessage,
-                parse_mode: 'Markdown'
+        if (START_IMAGE_URL && START_IMAGE_URL !== 'https://i.imgur.com/your-image.jpg') {
+            bot.sendPhoto(chatId, START_IMAGE_URL, {
+                caption: welcomeMessage
+            }).catch(() => {
+                // Fallback si l'image ne marche pas
+                bot.sendMessage(chatId, welcomeMessage);
             });
         } else {
             // Si pas d'image définie, envoyer juste le texte
-            await bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
+            bot.sendMessage(chatId, welcomeMessage);
         }
     } catch (error) {
-        // Fallback en cas d'erreur avec l'image
-        await bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
+        console.log('Erreur /start:', error);
+        // Fallback en cas d'erreur
+        bot.sendMessage(chatId, welcomeMessage);
     }
 });
 
