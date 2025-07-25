@@ -16,9 +16,9 @@ const {
 } = require("@whiskeysockets/baileys");
 
 // Configuration
-const BOT_TOKEN = '8310552962:AAGgt5c0JnWshhO4mKNQboTIHe8e3yFV1qg';
+const BOT_TOKEN = process.env.BOT_TOKEN || '8310552962:AAGgt5c0JnWshhO4mKNQboTIHe8e3yFV1qg';
 const IMAGE_URL = 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg';
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Messages
 const WELCOME_MESSAGE = `
@@ -326,14 +326,28 @@ bot.on('error', (error) => {
     console.log('Bot error:', error);
 });
 
+bot.on('polling_error', (error) => {
+    console.log('Polling error:', error);
+});
+
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+process.on('uncaughtException', (error) => {
+    console.log('Uncaught Exception:', error);
+    process.exit(1);
+});
+
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
     console.log('Bot is active and listening for commands...');
 });
+
+// Keep the server alive
+setInterval(() => {
+    console.log('Bot heartbeat - Active sessions:', activeSessions.size);
+}, 300000); // Every 5 minutes
 
 console.log('Telegram WhatsApp Pairing Bot started...');
