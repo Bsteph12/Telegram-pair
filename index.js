@@ -57,7 +57,8 @@ const {
     delay,
     makeCacheableSignalKeyStore,
     Browsers,
-    DisconnectReason
+    DisconnectReason,
+    fetchLatestBaileysVersion
 } = require("@whiskeysockets/baileys");
 
 // Configuration du bot
@@ -81,7 +82,7 @@ repo
 `;
 
 // Configuration de l'image de démarrage
-const START_IMAGE_URL = process.env.START_IMAGE_URL || 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg'; // Remplacez par votre URL d'image
+const START_IMAGE_URL = process.env.START_IMAGE_URL || 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg';
 
 // Base de données en mémoire
 const sessions = new Map();
@@ -109,7 +110,22 @@ async function createDirectories() {
     }
 }
 
-// Fonction principale de pairage (optimisée pour Render)
+// Fonction pour envoyer un message WhatsApp
+async function sendWhatsAppMessage(socket, phoneNumber, message) {
+    try {
+        // Formater le numéro pour WhatsApp
+        const formattedNumber = phoneNumber.includes('@') ? phoneNumber : `${phoneNumber}@s.whatsapp.net`;
+        
+        await socket.sendMessage(formattedNumber, { text: message });
+        console.log(`✅ Message WhatsApp envoyé à ${phoneNumber}`);
+        return true;
+    } catch (error) {
+        console.error(`❌ Erreur envoi WhatsApp à ${phoneNumber}:`, error);
+        return false;
+    }
+}
+
+// Fonction principale de pairage (version corrigée)
 async function startPairingProcess(chatId, phoneNumber) {
     const processId = `${chatId}_${Date.now()}`;
     const authPath = path.join('./temp', `auth_${processId}`);
@@ -118,9 +134,14 @@ async function startPairingProcess(chatId, phoneNumber) {
         // S'assurer que le répertoire existe
         await fs.ensureDir(authPath);
         
+        // Obtenir la dernière version de Baileys
+        const { version, isLatest } = await fetchLatestBaileysVersion();
+        console.log(`📱 Utilisation de Baileys version ${version.join('.')}, dernière: ${isLatest}`);
+        
         const { state, saveCreds } = await useMultiFileAuthState(authPath);
         
         let Smd = makeWASocket({
+            version,
             auth: {
                 creds: state.creds,
                 keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -128,6 +149,12 @@ async function startPairingProcess(chatId, phoneNumber) {
             printQRInTerminal: false,
             logger: pino({ level: "fatal" }).child({ level: "fatal" }),
             browser: Browsers.macOS("Safari"),
+            generateHighQualityLinkPreview: true,
+            syncFullHistory: false,
+            markOnlineOnConnect: false,
+            fireInitQueries: true,
+            emitOwnEvents: false,
+            defaultQueryTimeoutMs: 60000,
         });
 
         // Stocker le processus avec timeout
@@ -137,42 +164,79 @@ async function startPairingProcess(chatId, phoneNumber) {
             try {
                 await bot.sendMessage(chatId, "⏰ Processus de pairage expiré. Veuillez réessayer avec /pair.");
             } catch (e) {}
-        }, 10 * 60 * 1000); // 10 minutes
+        }, 15 * 60 * 1000); // 15 minutes pour plus de temps
 
         pairingProcesses.set(processId, { 
             socket: Smd, 
             chatId, 
             authPath, 
             timeoutId,
+            phoneNumber,
             startTime: Date.now()
         });
 
+        // Gestion du pairage
         if (!Smd.authState.creds.registered) {
-            await delay(1500);
-            phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
-            const code = await Smd.requestPairingCode(phoneNumber);
+            await delay(2000); // Augmenter le délai
             
-            bot.sendMessage(chatId, `
+            // Nettoyer le numéro de téléphone
+            const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+            
+            try {
+                const code = await Smd.requestPairingCode(cleanNumber);
+                
+                await bot.sendMessage(chatId, `
 ╭━[༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻]━╮
-║     𝐂𝐎𝐃𝐄
-╰━━━━━━━━━━━━━━━╯
+║     𝐂𝐎𝐃𝐄 𝐃𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄
+╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
-Numéro: +${phoneNumber}
-Code: ${code}
+📱 **Numéro:** +${cleanNumber}
+🔑 **Code:** \`${code}\`
 
-Le code expire dans 10 minutes.
-            `);
+⚠️ **IMPORTANT:**
+1. Ouvrez WhatsApp sur votre téléphone
+2. Allez dans **Paramètres** > **Appareils liés**
+3. Appuyez sur **Lier un appareil**
+4. Appuyez sur **Lier avec le numéro de téléphone**
+5. Entrez ce code: **${code}**
+
+⏱️ Le code expire dans 15 minutes.
+🔄 Le pairage peut prendre quelques minutes...
+                `, { parse_mode: 'Markdown' });
+
+            } catch (codeError) {
+                console.error('Erreur lors de la demande du code:', codeError);
+                await bot.sendMessage(chatId, `❌ Erreur lors de la génération du code. Veuillez vérifier que le numéro +${cleanNumber} est correct et réessayer.`);
+                await cleanupProcess(processId);
+                return;
+            }
         }
 
+        // Sauvegarder les credentials
         Smd.ev.on('creds.update', saveCreds);
         
-        Smd.ev.on("connection.update", async (s) => {
-            const { connection, lastDisconnect } = s;
+        // Gestion des événements de connexion
+        Smd.ev.on("connection.update", async (update) => {
+            const { connection, lastDisconnect, qr } = update;
+            
+            console.log(`📡 État de connexion pour ${processId}:`, connection);
+
+            if (connection === "connecting") {
+                console.log(`🔄 Connexion en cours pour ${processId}...`);
+            }
 
             if (connection === "open") {
+                console.log(`✅ Connexion établie pour ${processId}`);
+                
                 try {
-                    await delay(5000); // Réduire le délai pour Render
+                    // Attendre que la connexion soit stable
+                    await delay(3000);
                     
+                    // Obtenir les informations de l'utilisateur
+                    const userInfo = Smd.user;
+                    console.log('👤 Utilisateur connecté:', userInfo);
+                    
+                    // Lire le fichier de credentials
                     const credsFile = path.join(authPath, 'creds.json');
                     if (await fs.pathExists(credsFile)) {
                         // Upload vers Mega ou service de stockage
@@ -195,56 +259,111 @@ Le code expire dans 10 minutes.
                             phoneNumber: phoneNumber,
                             status: 'VERIFIED',
                             createdAt: new Date(),
-                            isActive: true
+                            isActive: true,
+                            userInfo: userInfo
                         };
                         
                         sessions.set(sessionId, sessionData);
                         userSessions.set(chatId, sessionId);
                         
-                        // Message de succès stylisé
-                        bot.sendMessage(chatId, `
+                        // Message de succès sur Telegram
+                        const telegramMessage = `
 ╭━[༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻]━╮
-║     𝐒𝐔𝐂𝐂È𝐒
-╰━━━━━━━━━━━━━━━╯
+║     ✅ 𝐏𝐀𝐈𝐑𝐀𝐆𝐄 𝐑É𝐔𝐒𝐒𝐈
+╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
-Session ID: ${sessionId}
-Numéro: +${phoneNumber}
-Créé le: ${sessionData.createdAt.toLocaleString()}
-Status: ${sessionData.status}
+🆔 **Session ID:** \`${sessionId}\`
+📱 **Numéro:** +${phoneNumber}
+👤 **Nom:** ${userInfo?.name || 'N/A'}
+📅 **Créé le:** ${sessionData.createdAt.toLocaleString()}
+🔒 **Status:** ${sessionData.status}
 
-┌───────────────┐
-│𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒     
-└─────────────────┘
+┌─────────────────────┐
+│ 📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒     
+└─────────────────────┘
 1. Copiez le Session ID ci-dessus
 2. Ouvrez votre fichier config.js
 3. Collez le Session ID dans la configuration
 4. Lancez votre bot
 
-⚠️ Important: Gardez ce Session ID confidentiel!
+⚠️ **Important:** Gardez ce Session ID confidentiel!
 
 ${MESSAGE}
-                        `);
+                        `;
+
+                        await bot.sendMessage(chatId, telegramMessage, { parse_mode: 'Markdown' });
+                        
+                        // NOUVEAU: Envoyer aussi le Session ID sur WhatsApp
+                        const whatsappMessage = `
+🤖 *༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ SESSION GÉNÉRÉE*
+
+✅ *Pairage réussi !*
+
+🆔 *Session ID:* ${sessionId}
+📱 *Numéro:* +${phoneNumber}
+📅 *Créé le:* ${sessionData.createdAt.toLocaleString()}
+
+📋 *INSTRUCTIONS:*
+1. Copiez ce Session ID
+2. Collez-le dans votre fichier config.js
+3. Lancez votre bot
+
+⚠️ *IMPORTANT:* Ne partagez jamais ce Session ID avec quelqu'un d'autre !
+
+${MESSAGE}
+                        `;
+
+                        // Envoyer le message WhatsApp
+                        const whatsappSent = await sendWhatsAppMessage(Smd, phoneNumber, whatsappMessage);
+                        
+                        if (whatsappSent) {
+                            await bot.sendMessage(chatId, "📨 Session ID également envoyé sur votre WhatsApp !");
+                        }
                         
                         // Nettoyer
                         await cleanupProcess(processId);
                         saveSessions();
+                        
+                    } else {
+                        throw new Error('Fichier de credentials non trouvé');
                     }
                 } catch (e) {
-                    console.log("Erreur lors du traitement:", e);
-                    bot.sendMessage(chatId, "❌ Erreur lors de la création de la session. Veuillez réessayer.");
+                    console.error("Erreur lors du traitement de la connexion:", e);
+                    await bot.sendMessage(chatId, "❌ Erreur lors de la création de la session. Veuillez réessayer.");
                     await cleanupProcess(processId);
                 }
             }
 
             if (connection === "close") {
-                let reason = new Boom(lastDisconnect?.error)?.output.statusCode;
-                console.log(`Connexion fermée pour ${processId}:`, reason);
+                const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+                console.log(`❌ Connexion fermée pour ${processId}. Raison:`, reason, lastDisconnect?.error?.message);
                 
                 await cleanupProcess(processId);
                 
+                // Messages d'erreur plus spécifiques
+                let errorMessage = "❌ Connexion interrompue. ";
+                
+                if (reason === DisconnectReason.badSession) {
+                    errorMessage += "Session invalide. Veuillez réessayer avec /pair.";
+                } else if (reason === DisconnectReason.connectionClosed) {
+                    errorMessage += "Connexion fermée. Veuillez réessayer.";
+                } else if (reason === DisconnectReason.connectionLost) {
+                    errorMessage += "Connexion perdue. Vérifiez votre internet et réessayez.";
+                } else if (reason === DisconnectReason.connectionReplaced) {
+                    errorMessage += "Connexion remplacée par une autre session.";
+                } else if (reason === DisconnectReason.loggedOut) {
+                    errorMessage += "Déconnecté de WhatsApp.";
+                } else if (reason === DisconnectReason.restartRequired) {
+                    errorMessage += "Redémarrage requis. Veuillez réessayer avec /pair.";
+                } else if (reason === DisconnectReason.timedOut) {
+                    errorMessage += "Timeout de connexion. Vérifiez que vous avez bien entré le code dans WhatsApp.";
+                } else {
+                    errorMessage += "Veuillez réessayer avec /pair.";
+                }
+                
                 if (reason !== DisconnectReason.loggedOut) {
                     try {
-                        bot.sendMessage(chatId, "❌ Connexion interrompue. Veuillez réessayer avec /pair.");
+                        await bot.sendMessage(chatId, errorMessage);
                     } catch (e) {
                         console.log('Erreur envoi message:', e);
                     }
@@ -252,11 +371,19 @@ ${MESSAGE}
             }
         });
 
+        // Gestion des messages reçus (pour debug)
+        Smd.ev.on('messages.upsert', async (m) => {
+            const message = m.messages[0];
+            if (message.key.fromMe) return;
+            
+            console.log('📨 Message reçu:', message.message?.conversation || message.message?.extendedTextMessage?.text);
+        });
+
     } catch (err) {
-        console.log("Erreur dans le processus de pairage:", err);
+        console.error("Erreur dans le processus de pairage:", err);
         await cleanupProcess(processId);
         try {
-            bot.sendMessage(chatId, "❌ Erreur lors de l'initialisation. Veuillez réessayer dans quelques minutes.");
+            await bot.sendMessage(chatId, `❌ Erreur lors de l'initialisation: ${err.message}. Veuillez réessayer dans quelques minutes.`);
         } catch (e) {
             console.log('Erreur envoi message erreur:', e);
         }
@@ -268,6 +395,8 @@ async function cleanupProcess(processId) {
     const process = pairingProcesses.get(processId);
     if (!process) return;
 
+    console.log(`🧹 Nettoyage du processus ${processId}`);
+
     // Nettoyer le timeout
     if (process.timeoutId) {
         clearTimeout(process.timeoutId);
@@ -276,14 +405,18 @@ async function cleanupProcess(processId) {
     // Fermer la connexion socket
     if (process.socket) {
         try {
+            await process.socket.logout();
             process.socket.end();
-        } catch (e) {}
+        } catch (e) {
+            console.log('Erreur fermeture socket:', e.message);
+        }
     }
 
     // Supprimer les fichiers temporaires
     if (process.authPath && await fs.pathExists(process.authPath)) {
         try {
             await fs.remove(process.authPath);
+            console.log(`🗑️ Fichiers temporaires supprimés: ${process.authPath}`);
         } catch (e) {
             console.log(`Erreur lors du nettoyage de ${process.authPath}:`, e);
         }
@@ -292,7 +425,7 @@ async function cleanupProcess(processId) {
     pairingProcesses.delete(processId);
 }
 
-// Commandes du bot stylisées
+// Commandes du bot (inchangées)
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const username = msg.from.username || msg.from.first_name || 'USER';
@@ -320,22 +453,18 @@ Bienvenue dans le système de pairage ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻!
 /pair suivi de votre numéro WhatsApp pour commencer.
     `;
     
-    // Envoyer l'image avec le message de bienvenue
     try {
         if (START_IMAGE_URL && START_IMAGE_URL !== 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg') {
             bot.sendPhoto(chatId, START_IMAGE_URL, {
                 caption: welcomeMessage
             }).catch(() => {
-                // Fallback si l'image ne marche pas
                 bot.sendMessage(chatId, welcomeMessage);
             });
         } else {
-            // Si pas d'image définie, envoyer juste le texte
             bot.sendMessage(chatId, welcomeMessage);
         }
     } catch (error) {
         console.log('Erreur /start:', error);
-        // Fallback en cas d'erreur
         bot.sendMessage(chatId, welcomeMessage);
     }
 });
@@ -368,11 +497,11 @@ Numéro de téléphone invalide.
     
     await bot.sendMessage(chatId, `
 ╔════════════╗
-║pairing..... 
+║🔄 PAIRAGE EN COURS... 
 ╚════════════╝
 
 **Numéro:** \`+${cleanNumber}\`
- Génération du code de pairage...
+⏳ Génération du code de pairage...
 
 Veuillez patienter quelques instants...
     `, { parse_mode: 'Markdown' });
@@ -424,7 +553,6 @@ Aucun processus de pairage en cours.
     }
 });
 
-// Ajouter les commandes manquantes avec style
 bot.onText(/\/delpair/, async (msg) => {
     const chatId = msg.chat.id;
     const userSession = userSessions.get(chatId);
@@ -478,6 +606,7 @@ Utilisez \`/pair [numéro]\` pour en créer une.
 
 🆔 **Session ID:** \`${sessionData.id}\`
 📱 **Numéro:** \`+${sessionData.phoneNumber}\`
+👤 **Nom:** \`${sessionData.userInfo?.name || 'N/A'}\`
 📅 **Créé le:** \`${new Date(sessionData.createdAt).toLocaleString()}\`
 🔒 **Status:** \`${sessionData.status}\`
 ⚡ **Actif:** \`${sessionData.isActive ? 'Oui' : 'Non'}\`
@@ -517,7 +646,7 @@ async function loadSessions() {
                 });
             }
             
-            console.log('✅ Sessions chargées');
+            console.log('✅ Sessions chargées:', sessions.size);
         }
     } catch (error) {
         console.error('❌ Erreur lors du chargement des sessions:', error);
@@ -528,8 +657,8 @@ async function loadSessions() {
 setInterval(async () => {
     const now = Date.now();
     for (const [processId, process] of pairingProcesses.entries()) {
-        // Nettoyer les processus de plus de 15 minutes
-        if (now - process.startTime > 15 * 60 * 1000) {
+        // Nettoyer les processus de plus de 20 minutes
+        if (now - process.startTime > 20 * 60 * 1000) {
             console.log(`🧹 Nettoyage du processus expiré: ${processId}`);
             await cleanupProcess(processId);
         }
@@ -556,39 +685,72 @@ bot.on('polling_error', (error) => {
 process.on('SIGTERM', async () => {
     console.log('🛑 Arrêt du service...');
     
-    // Sauvegarder les sessions
-    saveSessions();
-    
-    // Nettoyer tous les processus
-    for (const processId of pairingProcesses.keys()) {
+    // Nettoyer tous les processus de pairage en cours
+    for (const [processId] of pairingProcesses.entries()) {
         await cleanupProcess(processId);
     }
     
+    // Sauvegarder les sessions
+    if (sessions.size > 0) {
+        saveSessions();
+    }
+    
+    // Arrêter le bot
+    await bot.stopPolling();
+    
+    console.log('✅ Service arrêté proprement');
     process.exit(0);
 });
 
 process.on('SIGINT', async () => {
     console.log('🛑 Interruption du service...');
     
-    // Sauvegarder les sessions
-    saveSessions();
-    
-    // Nettoyer tous les processus
-    for (const processId of pairingProcesses.keys()) {
+    // Nettoyer tous les processus de pairage en cours
+    for (const [processId] of pairingProcesses.entries()) {
         await cleanupProcess(processId);
     }
     
+    // Sauvegarder les sessions
+    if (sessions.size > 0) {
+        saveSessions();
+    }
+    
+    // Arrêter le bot
+    await bot.stopPolling();
+    
+    console.log('✅ Service interrompu proprement');
     process.exit(0);
 });
 
-// Initialisation
-(async () => {
-    await createDirectories();
-    await loadSessions();
-    
-    console.log('🤖 ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ Pair Bot démarré sur Render...');
-    console.log(`🌐 Port: ${PORT}`);
-    console.log('📊 Sessions chargées:', sessions.size);
-})();
+// Gestion des erreurs non capturées
+process.on('uncaughtException', (error) => {
+    console.error('❌ Erreur non capturée:', error);
+});
 
-module.exports = { bot, app };
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promesse rejetée non gérée:', reason);
+});
+
+// Initialisation au démarrage
+async function initialize() {
+    try {
+        console.log('🚀 Initialisation du bot...');
+        
+        // Créer les répertoires nécessaires
+        await createDirectories();
+        
+        // Charger les sessions existantes
+        await loadSessions();
+        
+        console.log('✅ Bot initialisé avec succès');
+        console.log(`📊 Sessions actives: ${sessions.size}`);
+        console.log(`🔗 URL du service: https://votre-app.onrender.com`);
+        
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'initialisation:', error);
+        process.exit(1);
+    }
+}
+
+// Démarrer l'initialisation
+initialize();
