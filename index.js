@@ -21,7 +21,7 @@ const app = express();
 app.get('/', (req, res) => {
     res.json({
         status: 'active',
-        bot: 'TERRA-MD Pair Bot',
+        bot: '༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ Pair Bot',
         version: '2.0',
         uptime: process.uptime(),
         sessions: sessions.size
@@ -35,6 +35,7 @@ app.get('/health', (req, res) => {
 // Démarrer le serveur Express
 app.listen(PORT, () => {
     console.log(`🌐 Serveur démarré sur le port ${PORT}`);
+    console.log('🤖 ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ Bot initialisé...');
 });
 
 // Import des modules WhatsApp
@@ -76,8 +77,35 @@ const MESSAGE = process.env.MESSAGE || `
 *Gɪᴠᴇ ᴀ ꜱᴛᴀʀ ᴛᴏ ʀᴇᴘᴏ ꜰᴏʀ ᴄᴏᴜʀᴀɢᴇ* 🌟
 repo
 
-*TERRA-MD--WHATSAPP-BOT* ☃️
+*⛩️༺ 𝟎𝐱𝐀𝐤𝐮𝐦𝐚 ꙰ ༻⛩️  
+    ────────────────  
+🩸「 Un sanctuaire pour les démons du code 」🩸  
+        ░█░█░█░█░█░█░█░█░█░
+
+𝙉𝙤𝙪𝙨 𝙨𝙤𝙢𝙢𝙚𝙨 𝙡𝙖 𝙛𝙖𝙘𝙩𝙞𝙤𝙣 𝙘𝙖𝙘𝙝𝙚́𝙚.
+𝘾𝙚𝙪𝙭 𝙦𝙪𝙞 𝙖𝙪𝙩𝙤𝙢𝙖𝙩𝙞𝙨𝙚𝙣𝙩 𝙡’𝙞𝙣𝙚𝙭𝙥𝙡𝙞𝙦𝙪𝙖𝙗𝙡𝙚.
+𝘾𝙚𝙪𝙭 𝙦𝙪𝙞 𝙝𝙖𝙘𝙠𝙚𝙣𝙩 𝙡𝙖 𝙧𝙚́𝙖𝙡𝙞𝙩𝙚́ 𝙖𝙫𝙚𝙘 𝙙𝙚𝙨 𝙗𝙤𝙩𝙨.
+
+░ Bots WhatsApp MD | Bots Telegram  
+░ Scripts Termux 🧪  
+░ Automatisations occultes  
+░ Cours Web & Python 🧠  
+░ APKs interdits par les dieux  
+░ 🔒 Secret dev drops
+
+╭━━━━━━━╮
+    ┃𝟎𝐱𝐀𝐤𝐮𝐦𝐚 ┃  
+    ╰━ｖ━━━━╯ 
+           𝘿𝙚𝙫𝙞𝙡'𝙨 𝙨𝙚𝙧𝙫𝙚𝙧... 𝙤𝙣 𝙈𝙤𝙗𝙞𝙡𝙚.
+
+🕸️ Tu ne rejoins pas un simple groupe...  
+  Tu signes un pacte.
+
+➤ [🔥https://chat.whatsapp.com/KW1XG9bMDHXDdwUNs7rWgC?mode=r_c🔥]* ☃️
 `;
+
+// Configuration de l'image de démarrage
+const START_IMAGE_URL = process.env.START_IMAGE_URL || 'https://i.imgur.com/your-image.jpg'; // Remplacez par votre URL d'image
 
 // Base de données en mémoire
 const sessions = new Map();
@@ -149,16 +177,20 @@ async function startPairingProcess(chatId, phoneNumber) {
             const code = await Smd.requestPairingCode(phoneNumber);
             
             await bot.sendMessage(chatId, `
-🔐 **CODE DE PAIRAGE GÉNÉRÉ**
+╔══════════════════════════╗
+║     𝐂𝐎𝐃𝐄 𝐃𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄     ║
+╚══════════════════════════╝
 
-📱 **Numéro:** +${phoneNumber}
-🔑 **Code:** \`${code}\`
+**Numéro:** \`+${phoneNumber}\`
+**Code:** \`${code}\`
 
-**Instructions:**
-1. Ouvrez WhatsApp sur votre téléphone
-2. Allez dans Paramètres > Appareils liés
-3. Appuyez sur "Lier un appareil"
-4. Entrez le code: **${code}**
+┌─────────────────────────┐
+│       𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒      │
+└─────────────────────────┘
+\`1.\` Ouvrez WhatsApp sur votre téléphone
+\`2.\` Allez dans Paramètres > Appareils liés
+\`3.\` Appuyez sur "Lier un appareil"
+\`4.\` Entrez le code: **${code}**
 
 ⏰ Le code expire dans 10 minutes.
             `, { parse_mode: 'Markdown' });
@@ -201,22 +233,26 @@ async function startPairingProcess(chatId, phoneNumber) {
                         sessions.set(sessionId, sessionData);
                         userSessions.set(chatId, sessionId);
                         
-                        // Message de succès
+                        // Message de succès stylisé
                         await bot.sendMessage(chatId, `
-✅ **SESSION CRÉÉE AVEC SUCCÈS**
+╔══════════════════════════════════╗
+║        ✅ 𝐒𝐔𝐂𝐂È𝐒 𝐂𝐎𝐌𝐏𝐋𝐄𝐓        ║
+╚══════════════════════════════════╝
 
-🆔 **Session ID:** \`${sessionId}\`
-📱 **Numéro:** +${phoneNumber}
-📅 **Créé le:** ${sessionData.createdAt.toLocaleString()}
-🔒 **Status:** ${sessionData.status}
+ **Session ID:** \`${sessionId}\`
+**Numéro:** \`+${phoneNumber}\`
+ **Créé le:** \`${sessionData.createdAt.toLocaleString()}\`
+**Status:** \`${sessionData.status}\`
 
-**Instructions:**
-1. Copiez le Session ID ci-dessus
-2. Ouvrez votre fichier \`config.js\`
-3. Collez le Session ID dans la configuration
-4. Lancez votre bot
+┌──────────────────────────────────┐
+│         📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒         │
+└──────────────────────────────────┘
+\`1.\` Copiez le Session ID ci-dessus
+\`2.\` Ouvrez votre fichier \`config.js\`
+\`3.\` Collez le Session ID dans la configuration
+\`4.\` Lancez votre bot
 
-⚠️ **Important:** Gardez ce Session ID confidentiel!
+ **Important:** Gardez ce Session ID confidentiel!
 
 ${MESSAGE}
                         `, { parse_mode: 'Markdown' });
@@ -284,30 +320,50 @@ async function cleanupProcess(processId) {
     pairingProcesses.delete(processId);
 }
 
-// Commandes du bot (identiques à la version précédente)
-bot.onText(/\/start/, (msg) => {
+// Commandes du bot stylisées
+bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const username = msg.from.username || msg.from.first_name;
     
     const welcomeMessage = `
-🤖 **TERRA-MD PAIR BOT** ~ 2.0
-STATUS: VERIFIED
-USER: ${username.toUpperCase()}
+╔═══════════════════════════════════╗
+║      ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ ~ FINN_V1      ║
+║         STATUS: VERIFIED          ║
+║      USER: ${username.toUpperCase()}                ║
+╚═══════════════════════════════════╝
 
-Bienvenue dans le système de pairage TERRA-MD!
+🎉 Bienvenue dans le système de pairage ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻!
 
-**Commandes disponibles:**
->> /pair [numéro] - Créer une nouvelle session
->> /delpair - Supprimer votre session
->> /listpair - Lister vos sessions actives
+┌─────────────────────────────────┐
+│         𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐄𝐒           │
+└─────────────────────────────────┘
+\`>>\` 🔗 \`/pair [numéro]\` - Créer une nouvelle session
+\`>>\` 🗑️ \`/delpair\` - Supprimer votre session  
+\`>>\` 📋 \`/listpair\` - Lister vos sessions actives
 
-**Exemple:**
+┌─────────────────────────────────┐
+│          𝐄𝐗𝐄𝐌𝐏𝐋𝐄            │
+└─────────────────────────────────┘
 \`/pair 237123456789\`
 
-Utilisez /pair suivi de votre numéro WhatsApp pour commencer.
+ Utilisez /pair suivi de votre numéro WhatsApp pour commencer.
     `;
     
-    bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
+    // Envoyer l'image avec le message de bienvenue
+    try {
+        if (START_IMAGE_URL && START_IMAGE_URL !== 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg') {
+            await bot.sendPhoto(chatId, START_IMAGE_URL, {
+                caption: welcomeMessage,
+                parse_mode: 'Markdown'
+            });
+        } else {
+            // Si pas d'image définie, envoyer juste le texte
+            await bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
+        }
+    } catch (error) {
+        // Fallback en cas d'erreur avec l'image
+        await bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
+    }
 });
 
 bot.onText(/\/pair (.+)/, async (msg, match) => {
@@ -324,18 +380,28 @@ bot.onText(/\/pair (.+)/, async (msg, match) => {
     // Valider le numéro
     const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
     if (cleanNumber.length < 10 || cleanNumber.length > 15) {
-        bot.sendMessage(chatId, "❌ Numéro de téléphone invalide. Utilisez le format: /pair 237123456789");
+        bot.sendMessage(chatId, `
+╔═══════════════════════════╗
+║      ❌ 𝐄𝐑𝐑𝐄𝐔𝐑 𝐍𝐔𝐌É𝐑𝐎      ║
+╚═══════════════════════════╝
+
+Numéro de téléphone invalide.
+
+**Format correct:** \`/pair 237123456789\`
+        `, { parse_mode: 'Markdown' });
         return;
     }
     
     await bot.sendMessage(chatId, `
-🔄 **DÉMARRAGE DU PAIRAGE**
+╔═══════════════════════════════╗
+║    🔄 𝐃É𝐌𝐀𝐑𝐑𝐀𝐆𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄    ║
+╚═══════════════════════════════╝
 
-📱 Numéro: +${cleanNumber}
+📱 **Numéro:** \`+${cleanNumber}\`
 ⏳ Génération du code de pairage...
 
-Veuillez patienter quelques instants...
-    `);
+🕐 Veuillez patienter quelques instants...
+    `, { parse_mode: 'Markdown' });
     
     await startPairingProcess(chatId, cleanNumber);
 });
@@ -343,11 +409,15 @@ Veuillez patienter quelques instants...
 bot.onText(/^\/pair$/, (msg) => {
     const chatId = msg.chat.id;
     bot.sendMessage(chatId, `
-❌ **Numéro de téléphone requis**
+╔═══════════════════════════════╗
+║    ❌ 𝐍𝐔𝐌É𝐑𝐎 𝐑𝐄𝐐𝐔𝐈𝐒       ║
+╚═══════════════════════════════╝
 
 **Utilisation:** \`/pair [numéro]\`
 
-**Exemples:**
+┌───────────────────────────────┐
+│          💡 𝐄𝐗𝐄𝐌𝐏𝐋𝐄𝐒          │
+└───────────────────────────────┘
 • \`/pair 237123456789\`
 • \`/pair +237 123 456 789\`
 
@@ -362,9 +432,82 @@ bot.onText(/\/cancel/, async (msg) => {
     if (activeProcess) {
         const [processId] = activeProcess;
         await cleanupProcess(processId);
-        bot.sendMessage(chatId, "✅ Processus de pairage annulé.");
+        bot.sendMessage(chatId, `
+╔═══════════════════════════╗
+║    ✅ 𝐏𝐑𝐎𝐂𝐄𝐒𝐒 𝐀𝐍𝐍𝐔𝐋É    ║
+╚═══════════════════════════╝
+
+Le processus de pairage a été annulé avec succès.
+        `);
     } else {
-        bot.sendMessage(chatId, "❌ Aucun processus de pairage en cours.");
+        bot.sendMessage(chatId, `
+╔═══════════════════════════════╗
+║    ❌ 𝐀𝐔𝐂𝐔𝐍 𝐏𝐑𝐎𝐂𝐄𝐒𝐒𝐔𝐒    ║
+╚═══════════════════════════════╝
+
+Aucun processus de pairage en cours.
+        `);
+    }
+});
+
+// Ajouter les commandes manquantes avec style
+bot.onText(/\/delpair/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userSession = userSessions.get(chatId);
+    
+    if (!userSession) {
+        bot.sendMessage(chatId, `
+╔═══════════════════════════════╗
+║    ❌ 𝐀𝐔𝐂𝐔𝐍𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍      ║
+╚═══════════════════════════════╝
+
+Vous n'avez aucune session active à supprimer.
+        `);
+        return;
+    }
+    
+    sessions.delete(userSession);
+    userSessions.delete(chatId);
+    saveSessions();
+    
+    bot.sendMessage(chatId, `
+╔═══════════════════════════════╗
+║    ✅ 𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐒𝐔𝐏𝐏𝐑𝐈𝐌É𝐄   ║
+╚═══════════════════════════════╝
+
+Votre session a été supprimée avec succès.
+    `);
+});
+
+bot.onText(/\/listpair/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userSession = userSessions.get(chatId);
+    
+    if (!userSession) {
+        bot.sendMessage(chatId, `
+╔═══════════════════════════════╗
+║    📋 𝐀𝐔𝐂𝐔𝐍𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍       ║
+╚═══════════════════════════════╝
+
+Vous n'avez aucune session active.
+Utilisez \`/pair [numéro]\` pour en créer une.
+        `, { parse_mode: 'Markdown' });
+        return;
+    }
+    
+    const sessionData = sessions.get(userSession);
+    if (sessionData) {
+        bot.sendMessage(chatId, `
+╔═══════════════════════════════════╗
+║       📋 𝐕𝐎𝐒 𝐒𝐄𝐒𝐒𝐈𝐎𝐍𝐒         ║
+╚═══════════════════════════════════╝
+
+🆔 **Session ID:** \`${sessionData.id}\`
+📱 **Numéro:** \`+${sessionData.phoneNumber}\`
+📅 **Créé le:** \`${new Date(sessionData.createdAt).toLocaleString()}\`
+🔒 **Status:** \`${sessionData.status}\`
+⚡ **Actif:** \`${sessionData.isActive ? 'Oui' : 'Non'}\`
+        `, { parse_mode: 'Markdown' });
     }
 });
 
@@ -469,7 +612,7 @@ process.on('SIGINT', async () => {
     await createDirectories();
     await loadSessions();
     
-    console.log('🤖 TERRA-MD Pair Bot démarré sur Render...');
+    console.log('🤖 ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ Pair Bot démarré sur Render...');
     console.log(`🌐 Port: ${PORT}`);
     console.log('📊 Sessions chargées:', sessions.size);
 })();
