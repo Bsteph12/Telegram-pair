@@ -153,22 +153,14 @@ async function startPairingProcess(chatId, phoneNumber) {
             const code = await Smd.requestPairingCode(phoneNumber);
             
             bot.sendMessage(chatId, `
-╔══════════════════════════╗
-║    🔐 𝐂𝐎𝐃𝐄 𝐃𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄     ║
-╚══════════════════════════╝
+╭━[༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻]━╮
+║     𝐂𝐎𝐃𝐄
+╰━━━━━━━━━━━━━━━╯
 
-📱 Numéro: +${phoneNumber}
-🔑 Code: ${code}
+Numéro: +${phoneNumber}
+Code: ${code}
 
-┌─────────────────────────┐
-│      📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒      │
-└─────────────────────────┘
-1. Ouvrez WhatsApp sur votre téléphone
-2. Allez dans Paramètres > Appareils liés
-3. Appuyez sur "Lier un appareil"
-4. Entrez le code: ${code}
-
-⏰ Le code expire dans 10 minutes.
+Le code expire dans 10 minutes.
             `);
         }
 
@@ -211,14 +203,14 @@ async function startPairingProcess(chatId, phoneNumber) {
                         
                         // Message de succès stylisé
                         bot.sendMessage(chatId, `
-╔══════════════════════════════════╗
-║        ✅ 𝐒𝐔𝐂𝐂È𝐒 𝐂𝐎𝐌𝐏𝐋𝐄𝐓        ║
-╚══════════════════════════════════╝
+╭━[༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻]━╮
+║     𝐒𝐔𝐂𝐂È𝐒
+╰━━━━━━━━━━━━━━━╯
 
-🆔 Session ID: ${sessionId}
-📱 Numéro: +${phoneNumber}
-📅 Créé le: ${sessionData.createdAt.toLocaleString()}
-🔒 Status: ${sessionData.status}
+Session ID: ${sessionId}
+Numéro: +${phoneNumber}
+Créé le: ${sessionData.createdAt.toLocaleString()}
+Status: ${sessionData.status}
 
 ┌──────────────────────────────────┐
 │         📋 𝐈𝐍𝐒𝐓𝐑𝐔𝐂𝐓𝐈𝐎𝐍𝐒         │
@@ -306,32 +298,31 @@ bot.onText(/\/start/, async (msg) => {
     const username = msg.from.username || msg.from.first_name || 'USER';
     
     const welcomeMessage = `
-╔═══════════════════════════════════╗
-║      🤖 ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻ ~ 2.0       ║
-║         STATUS: VERIFIED          ║
-║      USER: ${username.toUpperCase()}                ║
-╚═══════════════════════════════════╝
+╭━[ ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻]━╮
+║ STATUS: VERIFIED
+║ USER: ${username.toUpperCase()}                ║
+╰━━━━━━━━━━━━━━━╯
 
-🎉 Bienvenue dans le système de pairage ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻!
+Bienvenue dans le système de pairage ༺𝟎𝐱𝐀𝐤𝐮𝐦𝐚  ꙰༻!
 
-┌─────────────────────────────────┐
-│        📋 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐄𝐒           │
-└─────────────────────────────────┘
->> 🔗 /pair [numéro] - Créer une nouvelle session
->> 🗑️ /delpair - Supprimer votre session  
->> 📋 /listpair - Lister vos sessions actives
+┌────────────┐
+│ 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐄𝐒  
+└────────────┘
+>> 🔗 /pair [numéro] 
+>> 🗑️ /delpair
+>> 📋 /listpair
 
-┌─────────────────────────────────┐
-│          💡 𝐄𝐗𝐄𝐌𝐏𝐋𝐄            │
-└─────────────────────────────────┘
+┌────────────┐
+│ 𝐄𝐗𝐄𝐌𝐏𝐋𝐄 
+└────────────┘
 /pair 237123456789
 
-🚀 Utilisez /pair suivi de votre numéro WhatsApp pour commencer.
+/pair suivi de votre numéro WhatsApp pour commencer.
     `;
     
     // Envoyer l'image avec le message de bienvenue
     try {
-        if (START_IMAGE_URL && START_IMAGE_URL !== 'https://i.imgur.com/your-image.jpg') {
+        if (START_IMAGE_URL && START_IMAGE_URL !== 'https://i.postimg.cc/W4bNVMWp/3a53da274b6548f6faeb96424f5262a5.jpg') {
             bot.sendPhoto(chatId, START_IMAGE_URL, {
                 caption: welcomeMessage
             }).catch(() => {
@@ -364,9 +355,9 @@ bot.onText(/\/pair (.+)/, async (msg, match) => {
     const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
     if (cleanNumber.length < 10 || cleanNumber.length > 15) {
         bot.sendMessage(chatId, `
-╔═══════════════════════════╗
-║      ❌ 𝐄𝐑𝐑𝐄𝐔𝐑 𝐍𝐔𝐌É𝐑𝐎      ║
-╚═══════════════════════════╝
+╔═════════════╗
+║𝐄𝐑𝐑𝐄𝐔𝐑 𝐍𝐔𝐌É𝐑𝐎
+╚════════════╝
 
 Numéro de téléphone invalide.
 
@@ -376,14 +367,14 @@ Numéro de téléphone invalide.
     }
     
     await bot.sendMessage(chatId, `
-╔═══════════════════════════════╗
-║    🔄 𝐃É𝐌𝐀𝐑𝐑𝐀𝐆𝐄 𝐏𝐀𝐈𝐑𝐀𝐆𝐄    ║
-╚═══════════════════════════════╝
+╔════════════╗
+║pairing..... 
+╚════════════╝
 
-📱 **Numéro:** \`+${cleanNumber}\`
-⏳ Génération du code de pairage...
+**Numéro:** \`+${cleanNumber}\`
+ Génération du code de pairage...
 
-🕐 Veuillez patienter quelques instants...
+Veuillez patienter quelques instants...
     `, { parse_mode: 'Markdown' });
     
     await startPairingProcess(chatId, cleanNumber);
@@ -392,15 +383,15 @@ Numéro de téléphone invalide.
 bot.onText(/^\/pair$/, (msg) => {
     const chatId = msg.chat.id;
     bot.sendMessage(chatId, `
-╔═══════════════════════════════╗
-║    ❌ 𝐍𝐔𝐌É𝐑𝐎 𝐑𝐄𝐐𝐔𝐈𝐒       ║
-╚═══════════════════════════════╝
+╔═══════════════╗
+║❌𝐍𝐔𝐌É𝐑𝐎 𝐑𝐄𝐐𝐔𝐈𝐒 
+╚══════════════╝
 
 **Utilisation:** \`/pair [numéro]\`
 
-┌───────────────────────────────┐
-│          💡 𝐄𝐗𝐄𝐌𝐏𝐋𝐄𝐒          │
-└───────────────────────────────┘
+┌──────────┐
+│ 𝐄𝐗𝐄𝐌𝐏𝐋𝐄𝐒     
+└──────────┘
 • \`/pair 237123456789\`
 • \`/pair +237 123 456 789\`
 
@@ -416,17 +407,17 @@ bot.onText(/\/cancel/, async (msg) => {
         const [processId] = activeProcess;
         await cleanupProcess(processId);
         bot.sendMessage(chatId, `
-╔═══════════════════════════╗
-║    ✅ 𝐏𝐑𝐎𝐂𝐄𝐒𝐒 𝐀𝐍𝐍𝐔𝐋É    ║
-╚═══════════════════════════╝
+╔══════════╗
+║ 𝐏𝐑𝐎𝐂𝐄𝐒𝐒 𝐀𝐍𝐍𝐔𝐋É
+╚══════════╝
 
 Le processus de pairage a été annulé avec succès.
         `);
     } else {
         bot.sendMessage(chatId, `
-╔═══════════════════════════════╗
-║    ❌ 𝐀𝐔𝐂𝐔𝐍 𝐏𝐑𝐎𝐂𝐄𝐒𝐒𝐔𝐒    ║
-╚═══════════════════════════════╝
+╔════════════╗
+║ 𝐀𝐔𝐂𝐔𝐍 𝐏𝐑𝐎𝐂𝐄𝐒𝐒𝐔𝐒
+╚════════════╝
 
 Aucun processus de pairage en cours.
         `);
@@ -440,9 +431,9 @@ bot.onText(/\/delpair/, async (msg) => {
     
     if (!userSession) {
         bot.sendMessage(chatId, `
-╔═══════════════════════════════╗
-║    ❌ 𝐀𝐔𝐂𝐔𝐍𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍      ║
-╚═══════════════════════════════╝
+╔══════════════╗
+║ 𝐀𝐔𝐂𝐔𝐍𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍   
+╚══════════════════╝
 
 Vous n'avez aucune session active à supprimer.
         `);
@@ -454,9 +445,9 @@ Vous n'avez aucune session active à supprimer.
     saveSessions();
     
     bot.sendMessage(chatId, `
-╔═══════════════════════════════╗
-║    ✅ 𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐒𝐔𝐏𝐏𝐑𝐈𝐌É𝐄   ║
-╚═══════════════════════════════╝
+╔═══════════╗
+║𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐒𝐔𝐏𝐏𝐑𝐈𝐌É𝐄 
+╚══════════════╝
 
 Votre session a été supprimée avec succès.
     `);
@@ -468,9 +459,9 @@ bot.onText(/\/listpair/, async (msg) => {
     
     if (!userSession) {
         bot.sendMessage(chatId, `
-╔═══════════════════════════════╗
-║    📋 𝐀𝐔𝐂𝐔𝐍𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍       ║
-╚═══════════════════════════════╝
+╔══════════╗
+║𝐀𝐔𝐂𝐔𝐍𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍
+╚═════════════╝
 
 Vous n'avez aucune session active.
 Utilisez \`/pair [numéro]\` pour en créer une.
@@ -481,9 +472,9 @@ Utilisez \`/pair [numéro]\` pour en créer une.
     const sessionData = sessions.get(userSession);
     if (sessionData) {
         bot.sendMessage(chatId, `
-╔═══════════════════════════════════╗
-║       📋 𝐕𝐎𝐒 𝐒𝐄𝐒𝐒𝐈𝐎𝐍𝐒         ║
-╚═══════════════════════════════════╝
+╔════════════╗
+║𝐕𝐎𝐒 𝐒𝐄𝐒𝐒𝐈𝐎𝐍𝐒
+╚══════════════╝
 
 🆔 **Session ID:** \`${sessionData.id}\`
 📱 **Numéro:** \`+${sessionData.phoneNumber}\`
