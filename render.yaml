@@ -1,0 +1,27 @@
+# render.yaml - Configuration de déploiement pour Render
+services:
+  - type: web
+    name: OxAkuma
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BOT_TOKEN
+        sync: false  # À définir dans le dashboard Render
+      - key: MEGA_EMAIL
+        sync: false  # À définir dans le dashboard Render
+      - key: MEGA_PASSWORD
+        sync: false  # À définir dans le dashboard Render
+      - key: USE_MEGA
+        value: "true"
+      - key: MESSAGE
+        value: |
+          *SESSION GENERATED SUCCESSFULLY* ✅
+          
+          *Gɪᴠᴇ ᴀ ꜱᴛᴀʀ ᴛᴏ ʀᴇᴘᴏ ꜰᴏʀ ᴄᴏᴜʀᴀɢᴇ* 🌟
+          https://github.com/votre-repo
+          
+          *FINN_V1 PAIRING* ☃️
